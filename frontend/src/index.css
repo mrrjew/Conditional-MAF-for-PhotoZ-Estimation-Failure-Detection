@@ -243,3 +243,11 @@ h1, h2, h3, h4, h5, h6 {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Tabs */
+.tab-btn { background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); color: var(--text-secondary); padding: 10px 24px; border-radius: 8px; font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+.tab-btn:hover { background: rgba(139, 92, 246, 0.1); color: var(--text-primary); }
+.tab-btn.active { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); border-color: var(--accent-purple); }
+/* Modals */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 24px; }
+.modal-content { background: var(--bg-dark); border: 1px solid var(--border-glass); border-radius: 16px; padding: 32px; width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(0,0,0,0.5); }
