@@ -1,9 +1,9 @@
 import joblib
 import numpy as np 
 
-feature_scaler = joblib.load("/models/feature_scaler.pkl")
-shape_scaler = joblib.load("/models/shape_scaler.pkl")
-rf_model = joblib.load("/models/rf_failure.pkl")
+feature_scaler = joblib.load("models/feature_scaler.pkl")
+shape_scaler = joblib.load("models/shape_scaler.pkl")
+rf_model = joblib.load("models/rf_failure.pkl")
 
 param_net = build_param_net()
 
