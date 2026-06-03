@@ -1,13 +1,13 @@
 from astropy.cosmology import LambdaCDM
 
-cosmo = LambdaCDM(H0 = 70, Om0=0.3, Ode0=0.7)
+cosmo = LambdaCDM(H0 = 70, Om0=0.3, Ode0=0.7)  # type: ignore
 
 
 def calculate(z):
 
     return {
-        "luminousity_distance_mpc":
-            float(cosmo.luminousity_distance(z).value),
+        "luminosity_distance_mpc":
+            float(cosmo.luminosity_distance(z).value),
         "comoving_distance_mpc":
             float(cosmo.comoving_distance(z).value),
         "lookback_time_gyr":

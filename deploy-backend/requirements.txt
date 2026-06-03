@@ -7,3 +7,6 @@ tensorflow
 joblib
 astropy
 pydantic
+scipy
+tensorflow-probability
+tf-keras

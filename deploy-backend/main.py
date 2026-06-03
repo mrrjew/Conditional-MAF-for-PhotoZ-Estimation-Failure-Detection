@@ -1,15 +1,27 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from schema import PredictRequest
+from schema import PredictRequest, PredictResponse
 
 from pipeline import predict
 from cosmology import calculate
 
 app = FastAPI(
-    title="Photmetric Redshift Failure Detection API"
+    title="Photometric Redshift Failure Detection API"
 )
 
-@app.post("/predict")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # In production, this should be restricted
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+def classify(failure_prob: float) -> str:
+    return "failure" if failure_prob > 0.15 else "success"
+
+@app.post("/predict", response_model=PredictResponse)
 def predict_redshift(request: PredictRequest):
 
     result = predict(
