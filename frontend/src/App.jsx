@@ -23,7 +23,7 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://127.0.0.1:8000/predict', {
+      const response = await fetch(`${import.meta.env.MODEL_API_URL}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -46,7 +46,7 @@ function App() {
     setOriginalBatchData(data);
     try {
       // Send max 500 at a time for demo purposes to avoid timeout, or just send all
-      const response = await fetch('http://127.0.0.1:8000/predict/batch', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/predict/batch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: data }),
