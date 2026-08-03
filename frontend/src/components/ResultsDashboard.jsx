@@ -6,7 +6,7 @@ import ProbabilityChart from './ProbabilityChart';
 
 const ResultsDashboard = ({ results }) => {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', height: '100%', minHeight: 0 }}>
       <div className="results-grid">
         <StatusCard 
           status={results.status} 
@@ -20,8 +20,8 @@ const ResultsDashboard = ({ results }) => {
         <CosmologyCard cosmology={results.cosmology} />
       )}
 
-      <div className="glass-panel">
-        <h3 style={{ marginBottom: '16px' }}>Redshift Probability Distribution</h3>
+      <div className="glass-panel chart-card">
+        <h3 style={{ marginBottom: '8px', fontSize: '0.95rem' }}>Redshift Probability Distribution</h3>
         <ProbabilityChart pdf={results.pdf} />
       </div>
     </div>

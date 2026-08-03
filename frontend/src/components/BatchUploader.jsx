@@ -25,8 +25,14 @@ const BatchUploader = ({ onBatchParsed, loading }) => {
     setIsParsing(true);
     setProgress(0);
 
+    if (file.size === 0) {
+      setError("The uploaded CSV file is empty (0 bytes). Please upload a file containing galaxy entries.");
+      setIsParsing(false);
+      return;
+    }
+
     if (file.type !== "text/csv" && !file.name.endsWith(".csv")) {
-      setError("Please upload a valid CSV file.");
+      setError("Please upload a valid CSV file (.csv).");
       setIsParsing(false);
       return;
     }
@@ -40,29 +46,91 @@ const BatchUploader = ({ onBatchParsed, loading }) => {
         setProgress(prev => Math.min(prev + 5, 95));
       },
       complete: function(results) {
-        // Guard against missing meta fields (e.g., empty file or parse error)
-        const fields = results?.meta?.fields?.map(header => header.replace(/\uFEFF/g, '').trim().toLowerCase()) ?? [];
-        const requiredCols = ['u', 'g', 'r', 'i', 'z'];
-        const missingCols = requiredCols.filter(col => !fields.includes(col));
-        if (missingCols.length > 0) {
-          console.warn('Missing required columns detected:', missingCols);
-          setError(`Missing required columns: ${missingCols.join(', ')}. The CSV header must include u, g, r, i, z.`);
+        const validRows = (results.data || []).filter(row => 
+          row && Object.values(row).some(v => v !== null && v !== undefined && String(v).trim() !== '')
+        );
+
+        if (validRows.length === 0) {
+          setError("The uploaded CSV file contains no data entries below the header row.");
           setIsParsing(false);
           return;
         }
-        // If fields array is empty, fall back to checking first data row keys
-        const dataRows = results.data || [];
-        if (fields.length === 0 && dataRows.length > 0) {
-          const firstRow = dataRows[0];
-          const missing = requiredCols.filter(col => !(col in firstRow));
-          if (missing.length > 0) {
-            console.warn('Missing columns based on first row:', missing);
-            setError(`Missing required columns: ${missing.join(', ')}. The CSV header must include u, g, r, i, z.`);
-            setIsParsing(false);
+
+        const dataRows = validRows;
+        const fields = results?.meta?.fields?.map(h => h.replace(/\uFEFF/g, '').trim().toLowerCase()) ?? [];
+        const requiredCols = ['u', 'g', 'r', 'i', 'z'];
+        
+        // Helper to find column matching band name (e.g. 'u', 'mag_u', 'u_band', 'dered_u', 'modelmag_u')
+        const findColumn = (band, availableFields) => {
+          if (availableFields.includes(band)) return band;
+          const match = availableFields.find(f => 
+            f === `mag_${band}` || 
+            f === `band_${band}` || 
+            f === `dered_${band}` ||
+            f.endsWith(`_${band}`) || 
+            f.startsWith(`${band}_`)
+          );
+          return match || null;
+        };
+
+        const colMapping = {};
+        const missingCols = [];
+
+        requiredCols.forEach(band => {
+          const matchedField = findColumn(band, fields);
+          if (matchedField) {
+            colMapping[band] = matchedField;
+          } else {
+            missingCols.push(band);
+          }
+        });
+
+        // If direct/fuzzy matching failed, check if file is headerless with numeric values in header line
+        if (missingCols.length > 0) {
+          const headerIsNumeric = fields.length >= 5 && fields.slice(0, 5).every(f => !isNaN(parseFloat(f)));
+          
+          if (headerIsNumeric) {
+            Papa.parse(file, {
+              header: false,
+              dynamicTyping: true,
+              skipEmptyLines: true,
+              complete: function(rawResults) {
+                const rows = (rawResults.data || []).filter(r => Array.isArray(r) && r.length >= 5);
+                if (rows.length === 0) {
+                  setError("CSV format unrecognized. Required columns: u, g, r, i, z.");
+                  setIsParsing(false);
+                  return;
+                }
+                const formattedData = rows.map(r => ({
+                  u: parseFloat(r[0]) || 0,
+                  g: parseFloat(r[1]) || 0,
+                  r: parseFloat(r[2]) || 0,
+                  i: parseFloat(r[3]) || 0,
+                  z: parseFloat(r[4]) || 0
+                }));
+                onBatchParsed(formattedData);
+                setProgress(100);
+                setIsParsing(false);
+              }
+            });
             return;
           }
+
+          setError(`Missing required columns: ${missingCols.join(', ')}. The CSV header must include u, g, r, i, z (e.g. u,g,r,i,z or mag_u,mag_g...).`);
+          setIsParsing(false);
+          return;
         }
-        onBatchParsed(dataRows);
+
+        // Map column names to standard u, g, r, i, z
+        const normalizedRows = dataRows.map(row => ({
+          u: parseFloat(row[colMapping.u]) || 0,
+          g: parseFloat(row[colMapping.g]) || 0,
+          r: parseFloat(row[colMapping.r]) || 0,
+          i: parseFloat(row[colMapping.i]) || 0,
+          z: parseFloat(row[colMapping.z]) || 0
+        }));
+
+        onBatchParsed(normalizedRows);
         setProgress(100);
         setIsParsing(false);
       },
@@ -91,9 +159,9 @@ const BatchUploader = ({ onBatchParsed, loading }) => {
   };
 
   return (
-    <div className="glass-panel" style={{ textAlign: 'center', padding: '40px 24px' }}>
-      <h2 style={{ marginBottom: '16px', fontSize: '1.5rem' }}>Upload Galaxy Catalog</h2>
-      <p style={{ color: 'var(--text-secondary)', marginBottom: '32px' }}>
+    <div className="glass-panel" style={{ textAlign: 'center', padding: '24px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      <h2 style={{ marginBottom: '10px', fontSize: '1.3rem' }}>Upload Galaxy Catalog</h2>
+      <p style={{ color: 'var(--text-secondary)', marginBottom: '20px', fontSize: '0.9rem' }}>
         Upload a CSV file containing <strong>u, g, r, i, z</strong> columns to process thousands of galaxies at once.
       </p>
       
@@ -107,7 +175,7 @@ const BatchUploader = ({ onBatchParsed, loading }) => {
         style={{
           border: `2px dashed ${dragActive ? 'var(--accent-purple)' : 'var(--border-glass)'}`,
           borderRadius: '16px',
-          padding: '60px 24px',
+          padding: '40px 24px',
           cursor: loading ? 'not-allowed' : 'pointer',
           background: dragActive ? 'rgba(139, 92, 246, 0.1)' : 'rgba(0,0,0,0.2)',
           transition: 'all 0.2s ease',

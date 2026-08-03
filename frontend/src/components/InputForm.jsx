@@ -52,42 +52,44 @@ const InputForm = ({ onSubmit, loading }) => {
   const bands = ['u', 'g', 'r', 'i', 'z'];
 
   return (
-    <div className="glass-panel">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '1.25rem', margin: 0 }}>Photometric Bands</h2>
+    <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '14px' }}>
+        <h2 style={{ fontSize: '1.1rem', margin: 0 }}>Photometric Bands</h2>
         <button
           type="button"
           onClick={randomize}
           className="btn-randomize"
           title="Randomize band values"
         >
-          <Shuffle size={16} />
+          <Shuffle size={14} />
           <span>Randomize</span>
         </button>
       </div>
-      <form onSubmit={handleSubmit}>
-        {bands.map(band => (
-          <div className="input-group" key={band}>
-            <label className="input-label" htmlFor={band}>
-              Band {band} (mag)
-            </label>
-            <input
-              type="number"
-              step="0.001"
-              id={band}
-              name={band}
-              value={formData[band]}
-              onChange={handleChange}
-              className="input-field"
-              required
-            />
-          </div>
-        ))}
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div>
+          {bands.map(band => (
+            <div className="input-group" key={band}>
+              <label className="input-label" htmlFor={band}>
+                Band {band} (mag)
+              </label>
+              <input
+                type="number"
+                step="0.001"
+                id={band}
+                name={band}
+                value={formData[band]}
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+            </div>
+          ))}
+        </div>
         <button 
           type="submit" 
           className="btn-primary" 
           disabled={loading}
-          style={{ marginTop: '24px' }}
+          style={{ marginTop: 'auto', paddingTop: '16px' }}
         >
           {loading ? (
             <>
@@ -96,7 +98,7 @@ const InputForm = ({ onSubmit, loading }) => {
             </>
           ) : (
             <>
-              <Rocket size={18} />
+              <Rocket size={16} />
               <span>Calculate Redshift</span>
             </>
           )}

@@ -66,24 +66,26 @@ function App() {
   return (
     <div className="app-container">
       <header className="header">
-        <h1 className="header-title">Cosmic Redshift Explorer</h1>
-        <p className="header-subtitle">Advanced Photometric Failure Detection Pipeline</p>
-      </header>
+        <div className="header-brand">
+          <h1 className="header-title">Cosmic Redshift Explorer</h1>
+          <p className="header-subtitle">Advanced Photometric Failure Detection Pipeline</p>
+        </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '32px' }}>
-        <button 
-          className={`tab-btn ${activeTab === 'single' ? 'active' : ''}`}
-          onClick={() => setActiveTab('single')}
-        >
-          Single Galaxy
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'batch' ? 'active' : ''}`}
-          onClick={() => setActiveTab('batch')}
-        >
-          Batch Analytics
-        </button>
-      </div>
+        <nav className="header-nav">
+          <button 
+            className={`tab-btn ${activeTab === 'single' ? 'active' : ''}`}
+            onClick={() => setActiveTab('single')}
+          >
+            Single Galaxy
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'batch' ? 'active' : ''}`}
+            onClick={() => setActiveTab('batch')}
+          >
+            Batch Analytics
+          </button>
+        </nav>
+      </header>
 
       <main className="main-content" style={activeTab === 'batch' ? { display: 'block' } : {}}>
         
@@ -106,8 +108,8 @@ function App() {
               )}
 
               {!results && !error && !loading && (
-                <div className="glass-panel" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '60px 24px' }}>
-                  <p>Enter photometric bands to compute redshift and cosmology metrics.</p>
+                <div className="glass-panel" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '40px 24px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                  <p style={{ margin: 0 }}>Enter photometric bands to compute redshift and cosmology metrics.</p>
                 </div>
               )}
             </section>
@@ -129,9 +131,9 @@ function App() {
             )}
 
             {batchResults && !batchError && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <button onClick={() => { setBatchResults(null); setOriginalBatchData(null); }} className="btn-primary" style={{ width: 'auto' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', height: '100%', minHeight: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', flexShrink: 0 }}>
+                  <button onClick={() => { setBatchResults(null); setOriginalBatchData(null); }} className="btn-primary" style={{ width: 'auto', padding: '6px 16px', fontSize: '0.85rem' }}>
                     Upload New Dataset
                   </button>
                 </div>
@@ -143,8 +145,8 @@ function App() {
 
       </main>
 
-      <footer style={{ textAlign: 'center', marginTop: '64px', color: 'var(--text-secondary)', fontSize: '0.875rem', opacity: 0.7 }}>
-        <p>Created by Jew Kofi Larbi Danquah</p>
+      <footer className="app-footer">
+        <span>Created by Jew Kofi Larbi Danquah</span>
       </footer>
     </div>
   );
