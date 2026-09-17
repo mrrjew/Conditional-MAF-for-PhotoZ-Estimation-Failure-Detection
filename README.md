@@ -268,7 +268,7 @@ For each galaxy:
 
 ## License
 
-This project does not currently declare a specific license in the repository root. If you plan to distribute or reuse it publicly, it is recommended to add an appropriate open-source license such as MIT or Apache 2.0.
+This project does not currently declare a specific license.
 
 ## Acknowledgements
 
